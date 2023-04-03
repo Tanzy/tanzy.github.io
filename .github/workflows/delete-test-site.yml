@@ -11,9 +11,21 @@ on:
 
 jobs:
  
+  check:
+    runs-on: ubuntu-latest # ubuntu-latest
+    outputs:
+      branch: ${{ steps.branch-name.outputs.current_branch }}
+    steps:
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v6.5
+
+      - run: echo Running on branch ${{ steps.branch-name.outputs.current_branch }}
+
   clear:
     runs-on: ubuntu-latest
-        # Clean to the development environment
+    needs: check
+    # Clean to the development environment
     environment:
       name: development
 
@@ -21,7 +33,7 @@ jobs:
 
       - name: Clean up
         run: |
-          echo "Clean up for branch ${{ github.event.ref }}"
+          echo "Clean up for branch ${{ needs.check.outputs.branch }}"
 
       - name: Remove old test site
         uses: StephanThierry/ftp-delete-action@v2.1
@@ -30,6 +42,6 @@ jobs:
           user: ${{ vars.ftp_username }}
           password: ${{ secrets.ftp_password }}
           remoteFiles: ''
-          remoteDirectories: "${{ github.event.ref }}/"
+          remoteDirectories: "${{ needs.check.outputs.branch }}/"
           workingDir: "/"
           ignoreSSL: "1"
