@@ -1,0 +1,126 @@
+name: Build Drafts
+
+on:
+  push:
+    branches-ignore:
+      - main 
+    paths-ignore:
+      - .gitignore
+      - README.md
+      - LICENSE
+      - '.github/**'
+      - 'scripts/**'
+
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+    group: "pages"
+    cancel-in-progress: true
+
+# Default to bash
+defaults:
+    run:
+      shell: bash
+
+
+env:
+  url: "https://hugo.kenlea.dev"
+  HUGO_VERSION: 0.111.2
+
+jobs:
+
+  check:
+    runs-on: ubuntu-latest # ubuntu-latest
+    outputs:
+      branch: ${{ steps.branch-name.outputs.current_branch }}
+    steps:
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v6.4
+
+      - run: echo Running on branch ${{ steps.branch-name.outputs.current_branch }}
+  
+  hugo:
+    runs-on: ubuntu-latest # ubuntu-latest
+    needs: check
+    if: needs.check.outputs.branch != 'main' # since this can be manually ran, we don't want it ran if on main
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
+          # If using the 'assets' git submodule from Chirpy Starter, uncomment above
+          # (See: https://github.com/cotes2020/chirpy-starter/tree/main/assets)
+
+      - name: Install Hugo CLI
+        run: |
+            wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
+            && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+            
+      - name: Install Dart Sass Embedded
+        run: sudo snap install dart-sass-embedded
+
+      - name: Install Node.js dependencies
+        run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
+
+      - name: Build with Hugo
+        env:
+          # For maximum backward compatibility with Hugo modules
+          HUGO_ENVIRONMENT: production
+          HUGO_ENV: production
+        run: |
+          hugo \
+            --gc \
+            --minify \
+            --baseURL "${{ env.url }}/${{ needs.check.outputs.branch }}/" \
+            --buildDrafts \
+            --buildFuture
+
+
+      - name: 🚀 Create artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Hugo_Site
+          path: ./public
+
+
+  publish:
+    runs-on: ubuntu-latest
+    if: |
+      success() &&
+      needs.check.outputs.branch != 'main'
+    needs: 
+      - hugo
+      - check
+
+      # Deploy to the development environment
+    environment:
+      name: development
+      url: "https://hugo.kenlea.me.uk/${{ github.event.ref }}"
+
+    steps:
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: Hugo_Site
+          path: ./public
+
+      # Upload to site
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          protocol: ftp
+          local-dir: ./public/
+          server-dir: ${{ needs.check.outputs.branch }}/
+          server: ${{ vars.ftp_server }}
+          username: ${{ vars.ftp_username }}
+          password: ${{ secrets.ftp_password }}

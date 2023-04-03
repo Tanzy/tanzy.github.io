@@ -1,0 +1,35 @@
+name: Delete Test Site
+
+on:
+  delete:
+     branches-ignore:
+       - main 
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+jobs:
+ 
+  clear:
+    runs-on: ubuntu-latest
+        # Clean to the development environment
+    environment:
+      name: development
+
+    steps:
+
+      - name: Clean up
+        run: |
+          echo "Clean up for branch ${{ github.event.ref }}"
+
+      - name: Remove old test site
+        uses: StephanThierry/ftp-delete-action@v2.1
+        with:
+          host: ${{ vars.ftp_server }}
+          user: ${{ vars.ftp_username }}
+          password: ${{ secrets.ftp_password }}
+          remoteFiles: ''
+          remoteDirectories: "${{ github.event.ref }}/"
+          workingDir: "/"
+          ignoreSSL: "1"

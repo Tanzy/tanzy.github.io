@@ -1,0 +1,51 @@
+name: workflow run cleanup
+on:
+  workflow_dispatch:
+    inputs:
+      days_old:
+        description: "The amount of days old to delete"
+        default: "7"
+        required: false
+      runs_keep:
+        description: "The number of runs to keep"
+        default: "5"
+        required: false
+
+  schedule:
+    - cron: '0 2 * * *'
+
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+  
+env:
+  retain_days: "7"
+  keep_minimum_runs: "5"
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Setup Env variables
+        run: |
+          if [[ $github.event.inputs.days_old != *"7"* ]]; then
+            echo "retain_days=${{github.event.inputs.days_old}}" >> $GITHUB_ENV
+          fi
+          if [[ $github.event.inputs.runs_keep != *"5"* ]]; then
+            echo "keep_minimum_runs=${{github.event.inputs.runs_keep}}" >> $GITHUB_ENV
+          fi
+      - name: Setup keep_minimum_runs
+        #if: contains($github.event.inputs.dry_run, '5') == false
+        run: |
+          echo retain_days $retain_days
+          echo keep_minimum_runs $keep_minimum_runs
+          echo dry_run $dry_run
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2.0.3
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: ${{ env.retain_days }}
+          keep_minimum_runs: ${{ env.keep_minimum_runs }}

@@ -1,0 +1,137 @@
+name: Publish to Pages
+
+on:
+  push:
+    branches:
+      - main 
+    paths-ignore:
+      - .gitignore
+      - README.md
+      - LICENSE
+      - LICENSE.md
+      - '.github/**'
+
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+    group: "pages"
+    cancel-in-progress: true
+
+# Default to bash
+defaults:
+    run:
+      shell: bash
+
+
+env:
+  HUGO_VERSION: 0.111.2
+
+jobs:
+
+  hugo:
+    runs-on: ubuntu-latest # ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
+          # If using the 'assets' git submodule from Chirpy Starter, uncomment above
+          # (See: https://github.com/cotes2020/chirpy-starter/tree/main/assets)
+
+      - name: Install Hugo CLI
+        run: |
+            wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
+            && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+            
+      - name: Install Dart Sass Embedded
+        run: sudo snap install dart-sass-embedded
+
+      - name: Install Node.js dependencies
+        run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
+
+      - name: Build with Hugo
+        env:
+          # For maximum backward compatibility with Hugo modules
+          HUGO_ENVIRONMENT: production
+          HUGO_ENV: production
+        run: |
+          hugo \
+            --gc \
+            --minify
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./public
+
+
+  publish-github:
+    runs-on: ubuntu-latest
+    if: |
+      success()
+    needs: 
+      - hugo
+    
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+  publish-hosting:
+    runs-on: ubuntu-latest
+    if: |
+      success()
+    needs: 
+      - hugo
+    
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the production environment
+    environment:
+      name: production
+      url: https://www.kenlea.me.uk
+
+    steps:
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: github-pages
+          path: ./site
+
+      - name: Unzip archive.tar
+        run: |
+          mkdir ./site/public \
+          && tar -xvf ./site/artifact.tar -C ./site/public
+
+      # Upload to site
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          protocol: ftp
+          local-dir: ./site/public/
+          server: ${{ vars.ftp_server }}
+          username: ${{ vars.ftp_username }}
+          password: ${{ secrets.ftp_password }}
