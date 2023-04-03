@@ -1,0 +1,36 @@
+author: Ken Lea
+
+#authorimage: /img/hugo.png
+
+description: Somewhere that I can put things
+
+dateformat: 'Jan 2, 2006'
+copyright: Ken Lea
+since: 2018
+
+#license: CC BY-SA 4.0
+#licenseURL: 'https://creativecommons.org/licenses/by-sa/4.0'
+
+showBuiltWith: true
+highlightjs: true
+highlightjsstyle: github
+
+themeColor: theme-base-0d
+#layoutReverse: true
+
+#googleAnalytics: Your tracking code
+
+mainSections: ["posts"]
+
+social:
+  twitter: De_Mote
+  github: Tanzy
+  gravatar: "kenlea@me.com"
+  #email: git@kenlea.dev
+  linkedin: ken-lea
+  stackoverflow: 423742
+
+postNavigation: false # (default true): Setting to false will disable the navigation Previous Post/ Next Post
+
+relatedPosts: true # (default false): Setting to true allows related posts. Please refer here for more details on related contents with Hugo.
+
