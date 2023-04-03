@@ -36,20 +36,8 @@ env:
 
 jobs:
 
-  check:
-    runs-on: ubuntu-latest # ubuntu-latest
-    outputs:
-      branch: ${{ steps.branch-name.outputs.current_branch }}
-    steps:
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v6.4
-
-      - run: echo Running on branch ${{ steps.branch-name.outputs.current_branch }}
-  
   hugo:
     runs-on: ubuntu-latest # ubuntu-latest
-    needs: check
     if: needs.check.outputs.branch != 'main' # since this can be manually ran, we don't want it ran if on main
     steps:
       - name: Checkout
@@ -57,8 +45,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
-          # If using the 'assets' git submodule from Chirpy Starter, uncomment above
-          # (See: https://github.com/cotes2020/chirpy-starter/tree/main/assets)
 
       - name: Install Hugo CLI
         run: |
@@ -80,7 +66,7 @@ jobs:
           hugo \
             --gc \
             --minify \
-            --baseURL "${{ env.url }}/${{ needs.check.outputs.branch }}/" \
+            --baseURL "${{ env.url }}/${{ github.event.ref }}/" \
             --buildDrafts \
             --buildFuture
 
@@ -99,12 +85,11 @@ jobs:
       needs.check.outputs.branch != 'main'
     needs: 
       - hugo
-      - check
 
       # Deploy to the development environment
     environment:
       name: development
-      url: "https://hugo.kenlea.me.uk/${{ github.event.ref }}"
+      url: "${{ env.url }}/${{ github.event.ref }}"
 
     steps:
 
@@ -116,11 +101,11 @@ jobs:
 
       # Upload to site
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           protocol: ftp
           local-dir: ./public/
-          server-dir: ${{ needs.check.outputs.branch }}/
+          server-dir: ${{ github.event.ref }}/
           server: ${{ vars.ftp_server }}
           username: ${{ vars.ftp_username }}
           password: ${{ secrets.ftp_password }}

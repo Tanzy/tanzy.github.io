@@ -128,7 +128,7 @@ jobs:
 
       # Upload to site
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           protocol: ftp
           local-dir: ./site/public/
