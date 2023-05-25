@@ -52,7 +52,8 @@ dotnet sln Sample.Console add Sample.Console/Sample.Console
 
 Another way to create the solution is by using the app of your choice. Sometimes, it’s good to know how to do things in the command line 😀
 
-![](ProjectSelection.png align=“center”)
+![Project Selection uisng JetBrains Rider](ProjectSelection.png)
+_Project Selection uisng JetBrains Rider_
 
 ## Configure Dependency Injection
 
