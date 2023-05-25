@@ -1,4 +1,4 @@
-—
+---
 title: ‘.Net 7 Console App with Serilog: Step-by-Step Instructions’
 date: 2023-05-25 9:00:00 +00:00
 layout: post
@@ -9,7 +9,7 @@ tags:
     - .Net
     - Serilog
     - Logging
-—
+---
 
 > This article explains how to create a console application with logging in place using .Net SDK, Visual Studio, and Serilog. It covers setting up the project, configuring dependency injection, creating the base application, and adding Serilog. It also explains the purpose of each NuGet package used and how to configure Serilog using the Configuration Manager and Dependency Injector.
 
