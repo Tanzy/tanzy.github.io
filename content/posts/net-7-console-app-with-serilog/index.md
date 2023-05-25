@@ -3,7 +3,7 @@
 title: '.Net 7 Console App with Serilog: Step-by-Step Instructions'
 date: 2023-05-25 9:00:00 +00:00
 layout: post
-permalink: /2023/05/net-7-console-app-with-serilog/
+url: /2023/05/net-7-console-app-with-serilog/
 slug: /2023/05/net-7-console-app-with-serilog/
 categories:
     - Dotnet 
