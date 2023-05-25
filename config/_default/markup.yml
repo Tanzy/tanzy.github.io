@@ -1,0 +1,9 @@
+highlight:
+  #guessSyntax = false
+  #hl_Lines = ""
+  #lineNoStart = 1
+  #lineNos = true
+  #lineNumbersInTable = true
+  #tabWidth = 4
+  #noClasses = false
+  style: github
