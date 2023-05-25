@@ -5,7 +5,7 @@ tags : [ "hugo"]
 categories : [ "hugo" ]
 layout: post
 highlight: false
-draft: true
+
 ---
 
 ## Why
