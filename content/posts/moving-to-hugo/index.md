@@ -16,4 +16,4 @@ I looked a Jekyll and almost went with it. But was not sure, you never know I ma
 
 ## Other Sites
 
-I'm going to try to cross post some of my stuff to [Hashnode](https://hasnode.com), or I may well just post on [Hashnode](https://tanzy.hashnode.dev). I will be using the domain [kenlea.blog](https://www.kenlea.blog).
+I'm going to try to cross post some of my stuff to [Hashnode](https://hashnode.com), or I may well just post on [Hashnode](https://tanzy.hashnode.dev). I will be using the domain [kenlea.blog](https://www.kenlea.blog).
