@@ -1,2 +1,2 @@
 posts: /posts/:year/:month/:title/
-tags: /:title/
+tags: /tags/:title/
