@@ -43,7 +43,7 @@ jobs:
           echo keep_minimum_runs $keep_minimum_runs
           echo dry_run $dry_run
       - name: Delete workflow runs
-        uses: Mattraks/delete-workflow-runs@v2.0.3
+        uses: Mattraks/delete-workflow-runs@v2.0.4
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
