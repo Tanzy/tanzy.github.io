@@ -19,7 +19,7 @@ main:
 #    name: Archive
 #    url: /archive/
 #    weight: 3
-  - name: Projects
-    identifier: projects
-    weight: 40
-    url: /projects/
+#  - name: Projects
+#    identifier: projects
+#    weight: 40
+#    url: /projects/
