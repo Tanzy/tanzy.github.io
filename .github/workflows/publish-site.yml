@@ -68,7 +68,7 @@ jobs:
             --minify
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
 
@@ -94,7 +94,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v3
+        uses: actions/deploy-pages@v4
 
   publish-hosting:
     runs-on: ubuntu-latest
@@ -116,7 +116,7 @@ jobs:
     steps:
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: github-pages
           path: ./site
@@ -128,7 +128,7 @@ jobs:
 
       # Upload to site
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           protocol: ftp
           local-dir: ./site/public/
